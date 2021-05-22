@@ -24,7 +24,8 @@ void testRef(char *name, int chapter, int start, int to)
 		printf("Error parsing: %s %d %d:%d (%d)\n", name, chapter, start, to, err);
 	}
 
-	// Demo didn't have this - leaked a lot of memory..
+	// Demo didn't have this, leaked 1/3 of
+	// allocated memory
 	free(text);
 }
 
@@ -37,7 +38,7 @@ int main()
 	}
 
 	clock_t start_time = clock();
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 100; i++) {
 		testRef("Rev", 1, 1, 1);
 	}
 
