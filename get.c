@@ -196,3 +196,74 @@ char *haplous_work_chapter_get(FILE *file, struct haplous_reference ref,
 	*err = HAPLOUS_OK;
 	return buffer;
 }
+
+struct haplous_reader haplous_reader_new(struct haplous_work work, struct haplous_reference ref, int *err) {
+	struct haplous_reader reader = {
+		.work = work,
+		.reference = ref,
+		.verse = NULL,
+		.current_verse = 1,
+	};
+
+	fseek(reader.work.file, 0, SEEK_SET);
+	int line = 0;
+	line = haplous_work_book_seek(reader.work.file, reader.reference.id);
+	line = haplous_work_chapter_seek(reader.work.file, reader.reference.chapter);
+	if (line < 0) {
+		*err = HAPLOUS_REF_NOT_FOUND;
+		return reader;
+	}
+
+	return reader;
+}
+
+// haplous_next provides an interface for obtaining a reference verse-by-verse
+int haplous_next(struct haplous_reader *reader) {
+
+	// seek to the first verse
+	int c;
+	while ((c = getc(reader->work.file)) != EOF) {
+		if (c == '\n') {
+			reader->current_verse += 1;
+		}
+
+		if (reader->current_verse >= reader->reference.verse_start) {
+			break;
+		}
+	}
+
+	size_t buf_size = 500;
+	char *buffer = malloc(buf_size);
+	if (buffer == NULL) {
+		return HAPLOUS_OUT_OF_MEMORY;
+	}
+
+	// load the verse to the buffer
+	size_t i = 0;
+	while ((c = getc(reader->work.file)) != EOF) {
+		if (c == '\n') {
+			break;
+		}
+
+		if (i >= buf_size) {
+			buf_size += 1;
+			buffer = realloc(buffer, buf_size);
+			if (buffer == NULL) {
+				free(buffer);
+				return HAPLOUS_OUT_OF_MEMORY;
+			}
+		}
+
+		buffer[i] = (char)c;
+		i++;
+	}
+	buffer[i] = '\0';
+
+	reader->verse = buffer;
+	if (reader->current_verse <= reader->reference.verse_end) {
+		reader->current_verse += 1;
+		return HAPLOUS_CONTINUE;
+	} else {
+		return HAPLOUS_OK;
+	}
+}

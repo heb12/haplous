@@ -12,6 +12,7 @@ extern "C" {
 #define MAX_ID_LEN 20
 
 enum haplous_error {
+	HAPLOUS_CONTINUE = 1, // used for the reader
 	HAPLOUS_OK = 0,
 	HAPLOUS_OTHER_ERROR = -1,
 	HAPLOUS_INVALID_REF = -2,
@@ -51,6 +52,13 @@ struct haplous_work {
 	struct haplous_work_metadata metadata;
 };
 
+struct haplous_reader {
+	struct haplous_work work;
+	struct haplous_reference reference;
+	char *verse;
+	size_t current_verse;
+};
+
 struct haplous_work haplous_work_init(const char *, int *);
 int haplous_work_cleanup(struct haplous_work *);
 
@@ -58,6 +66,9 @@ char *haplous_work_chapter_get(FILE *, struct haplous_reference, int *);
 char *haplous_work_verses_get(FILE *, struct haplous_reference, int *);
 
 char *haplous_work_metadata_get(FILE *, const char[MAX_ID_LEN]);
+
+struct haplous_reader haplous_reader_new(struct haplous_work, struct haplous_reference, int *);
+int haplous_next(struct haplous_reader *);
 
 #ifdef __cplusplus
 }

@@ -14,19 +14,22 @@ void testRef(char *name, int chapter, int start, int to)
 		name,
 		chapter,
 		start,
-		to,
+		to + 1,
 	};
-	
-	char *text =
-		haplous_work_verses_get(work.file, ref, &err);
+
+	struct haplous_reader reader = haplous_reader_new(work, ref, &err);
+	assert(err == 0);
+
+	while (haplous_next(&reader) == HAPLOUS_CONTINUE) {
+		puts(reader.verse);
+		//free(reader.verse);
+	}
+
+	free(reader.verse);
 
 	if (err != HAPLOUS_OK) {
 		printf("Error parsing: %s %d %d:%d (%d)\n", name, chapter, start, to, err);
 	}
-
-	// Demo didn't have this, leaked 1/3 of
-	// allocated memory
-	free(text);
 }
 
 int main()
@@ -38,14 +41,13 @@ int main()
 	}
 
 	clock_t start_time = clock();
-	for (int i = 0; i < 100; i++) {
-		testRef("Rev", 1, 1, 1);
+	for (int i = 0; i < 5; i++) {
+		testRef("John", 3, 16, 17);
 	}
 
 	double elapsed_time =
 		(double)(clock() - start_time) / CLOCKS_PER_SEC;
 
 	printf("Done in %f seconds\n", elapsed_time);
-	
 	haplous_work_cleanup(&work);
 }
