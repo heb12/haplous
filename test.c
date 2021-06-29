@@ -22,7 +22,7 @@ void testRef(char *name, int chapter, int start, int to)
 
 	while (haplous_next(&reader) == HAPLOUS_CONTINUE) {
 		puts(reader.verse);
-		//free(reader.verse);
+		free(reader.verse);
 	}
 
 	free(reader.verse);
