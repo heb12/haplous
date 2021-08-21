@@ -21,7 +21,7 @@ void testRef(char *name, int chapter, int start, int to)
 	assert(err == 0);
 
 	while (haplous_next(&reader) == HAPLOUS_CONTINUE) {
-		puts(reader.verse);
+		//puts(reader.verse);
 		free(reader.verse);
 	}
 
@@ -34,16 +34,14 @@ void testRef(char *name, int chapter, int start, int to)
 
 int main()
 {
-	work = haplous_work_init("kjv.txt", &err);
+	work = haplous_work_init("../kjv.txt", &err);
 	if (err != HAPLOUS_OK) {
 		puts("Err");
 		return -1;
 	}
 
 	clock_t start_time = clock();
-	for (int i = 0; i < 5; i++) {
-		testRef("John", 3, 16, 17);
-	}
+	testRef("John", 3, 16, 20);
 
 	double elapsed_time =
 		(double)(clock() - start_time) / CLOCKS_PER_SEC;

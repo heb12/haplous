@@ -228,6 +228,10 @@ int haplous_next(struct haplous_reader *reader) {
 		}
 
 		if (reader->current_verse >= reader->reference.verse_start) {
+			if (c != '\n') {
+				fseek(reader->work.file, -1, SEEK_CUR);
+			}
+
 			break;
 		}
 	}
